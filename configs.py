@@ -1,3 +1,6 @@
+from os import system
+
+CLEARSCREEN = lambda: system('cls')
 # Crucial
 ADMINUSERNAME = "admin"
 QUITSTATEMENT = "quit"
@@ -8,6 +11,15 @@ FILEHANDLER_NAME = "name"
 FILEHANDLER_FILENAME = "users.txt"
 FILEHANDLER_SPACE = " "
 
+ADMIN_INSTRUCTION_LOGOUT = "logout"
+ADMIN_INSTRUCTION_SPEAKERS = "speakers"
+ADMIN_INSTRUCTION_SPEAKERS_ADD = "add"
+ADMIN_INSTRUCTION_SPEAKERS_REMOVE = "remove"
+ADMIN_INSTRUCTION_SPEAKERS_EDIT = "edit"
+ADMIN_INSTRUCTION_SURVEY = "survey"
+ADMIN_INSTRUCTION_SURVEY_CLOSE = "close"
+ADMIN_INSTRUCTION_SURVEY_START = "start"
+
 
 # Optional
 INPUT_LOGIN_USERNAME = "enter username:"
@@ -17,3 +29,5 @@ ERROR_LOGIN_SPACEINPUT = "spaces not allowed in inputs"
 ERROR_LOGIN_WRONGPASSWORD = "Wrong Password"
 ERROR_LOGIN_EMPTYINPUT = "empty input not allowed"
 ERROR_LOGIN_USERNAMENOTFOUND = "Unregistered username"
+ERROR_ADMINPAGE_UNKNOWNCOMMAND = "Unknown command"
+

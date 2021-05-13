@@ -8,6 +8,7 @@ import json
 
 frontUser = None
 
+
 def mainFunction():
     print("Please login in project(enter 'quit' to exit the application")
     global frontUser
@@ -19,7 +20,7 @@ def mainFunction():
         password = input(INPUT_LOGIN_PASSWORD)
         if QUITSTATEMENT in username or QUITSTATEMENT in password:
             break
-        if not(len(username) and len(password)):
+        if not (len(username) and len(password)):
             print(ERROR_LOGIN_EMPTYINPUT)
             continue
         elif FILEHANDLER_SPACE in username or FILEHANDLER_SPACE in password:
@@ -45,16 +46,49 @@ def mainFunction():
                 print(ERROR_LOGIN_USERNAMENOTFOUND)
 
 
-
 def greeting():
     print("*******************  Welcome to Project  *******************\n\n")
 
 
 def adminMainPage():
+    CLEARSCREEN()
+    switcher = {
+        ADMIN_INSTRUCTION_SPEAKERS: admin_speaker,
+        ADMIN_INSTRUCTION_SURVEY: admin_surveys,
+        ADMIN_INSTRUCTION_LOGOUT: logout
+    }
+    while True:
+        instruction = input("select an operation(enter {} to logout): {} {} {} "
+                            "            ".format(ADMIN_INSTRUCTION_LOGOUT
+                                                  , ADMIN_INSTRUCTION_SPEAKERS,
+                                                  ADMIN_INSTRUCTION_SURVEY,
+                                                  ADMIN_INSTRUCTION_LOGOUT))
+        func = switcher.get(instruction, invalidInstruction)
+        if instruction == ADMIN_INSTRUCTION_LOGOUT:
+            break
+        func()
+
+
+def admin_speaker():
     pass
+
+
+def admin_surveys():
+    pass
+
 
 def userMainPage():
     pass
+
+
+def logout():
+    print("----------------------- User logged out -----------------------")
+    del frontUser
+
+
+def invalidInstruction():
+    print(ERROR_ADMINPAGE_UNKNOWNCOMMAND)
+
 
 def userWriter():
     """
@@ -81,6 +115,5 @@ def userWriter():
 
 
 if __name__ == "__main__":
-
     greeting()
     mainFunction()
