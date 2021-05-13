@@ -18,15 +18,25 @@ SpeakerFeatures:
     5. sufficient knowledge (int)
 
 """
-class User:
-    def __init__(self):
-        self.username = None
-        self.password = None
-    
-class Speaker:
-    def __init__(self, name, lastName, firstName):
-        self.lastName = lastName
-        self.firstName = firstName
+from abc import ABC
+class User(ABC):
+    def __init__(self, _username):
+        self.username = _username
+
+class Student(User):
+    def __init__(self, _name, _username):
+        super().__init__(_username)
+        self.name = _name
+
+class Professor(User):
+    def __init__(self, _name, _username):
+        super().__init__(_username)
+        self.name = _name
+
+class Speaker(User):
+    def __init__(self, _name, _username):
+        super().__init__(_username)
+        self.name = _name
         self.topic = ""
         self.presentationDescription = ""
 

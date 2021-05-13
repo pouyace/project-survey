@@ -2,43 +2,47 @@
 Survey Project
 
 """
-import classes
+from classes import *
+from configs import *
 import json
 
-
-
+frontUser = None
 
 def mainFunction():
     print("Please login in project(enter 'quit' to exit the application")
-    data = []
-    with open("users.txt", 'r') as jsonReader:
+    global frontUser
+    with open(FILEHANDLER_FILENAME, 'r') as jsonReader:
         data = json.load(jsonReader)
 
     while True:
-        username = input("enter username:")
-        password = input("enter password:")
-        if 'quit' in username or 'quit' in password:
+        username = input(INPUT_LOGIN_USERNAME)
+        password = input(INPUT_LOGIN_PASSWORD)
+        if QUITSTATEMENT in username or QUITSTATEMENT in password:
             break
         if not(len(username) and len(password)):
-            print("empty input not allowed")
+            print(ERROR_LOGIN_EMPTYINPUT)
             continue
-        elif ' ' in username or ' ' in password:
-            print("spaces not allowed in inputs")
+        elif FILEHANDLER_SPACE in username or FILEHANDLER_SPACE in password:
+            print(ERROR_LOGIN_SPACEINPUT)
             continue
         else:
             notFound = 1
-            for p in data['users']:
-                if p['username'] == username:
+            for p in data[FILEHANDLER_USER]:
+                if p[FILEHANDLER_USERNAME] == username:
                     notFound = 0
-                    if p['password'] == password:
-                        print("yes")
+                    if p[FILEHANDLER_PASSWORD] == password:
+                        if username == ADMINUSERNAME:
+                            frontUser = Professor(FILEHANDLER_USERNAME, p[FILEHANDLER_NAME])
+                            adminMainPage()
+                        else:
+                            frontUser = Student(FILEHANDLER_USERNAME, p[FILEHANDLER_NAME])
+                            userMainPage()
                         break
-                    #     HERE
                     else:
-                        print("Wrong Password")
+                        print(ERROR_LOGIN_WRONGPASSWORD)
                         break
             if notFound:
-                print("Unregistered username")
+                print(ERROR_LOGIN_USERNAMENOTFOUND)
 
 
 
@@ -53,6 +57,7 @@ def userMainPage():
     pass
 
 def userWriter():
+    """
     data = {'users': []}
     data['users'].append({
         'name': 'Pouya',
@@ -72,7 +77,7 @@ def userWriter():
 
     with open('users.txt', 'w') as outfile:
         json.dump(data, outfile)
-
+"""
 
 
 if __name__ == "__main__":
