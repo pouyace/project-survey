@@ -18,9 +18,10 @@ SpeakerFeatures:
     5. sufficient knowledge (int)
 
 """
-class Student:
+class User:
     def __init__(self):
         self.username = None
+        self.password = None
     
 class Speaker:
     def __init__(self, name, lastName, firstName):
