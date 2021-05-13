@@ -13,5 +13,10 @@ def mainFunction():
 def greeting():
     pass
 
+def adminMainPage():
+    pass
+
+def userMainPage():
+
 if __name__ == "__main__":
     print("Hello world")

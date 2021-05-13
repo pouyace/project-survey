@@ -18,6 +18,10 @@ SpeakerFeatures:
     5. sufficient knowledge (int)
 
 """
+class Student:
+    def __init__(self):
+        self.username = None
+    
 class Speaker:
     def __init__(self, name, lastName, firstName):
         self.lastName = lastName
