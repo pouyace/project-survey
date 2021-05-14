@@ -17,8 +17,10 @@ def mainFunction():
 
     while True:
         username = input(INPUT_LOGIN_USERNAME)
+        if INPUT_GLOBAL_QUITSTATEMENT in username:
+            break
         password = input(INPUT_LOGIN_PASSWORD)
-        if QUITSTATEMENT in username or QUITSTATEMENT in password:
+        if INPUT_GLOBAL_QUITSTATEMENT in password:
             break
         if not (len(username) and len(password)):
             print(ERROR_LOGIN_EMPTYINPUT)
@@ -59,8 +61,8 @@ def adminMainPage():
     }
     while True:
         instruction = input("select an operation(enter {} to logout): {} {} {} "
-                            "            ".format(ADMIN_INSTRUCTION_LOGOUT
-                                                  , ADMIN_INSTRUCTION_SPEAKERS,
+                            "            ".format(ADMIN_INSTRUCTION_LOGOUT,
+                                                  ADMIN_INSTRUCTION_SPEAKERS,
                                                   ADMIN_INSTRUCTION_SURVEY,
                                                   ADMIN_INSTRUCTION_LOGOUT))
         func = switcher.get(instruction, invalidInstruction)
@@ -70,7 +72,56 @@ def adminMainPage():
 
 
 def admin_speaker():
-    pass
+    CLEARSCREEN()
+    data = openFile()
+
+    if not len(data[FILEHANDLER_SPEAKER]):
+        # no speaker to show
+        print(ERROR_ADMINPAGE_NOSPEAKER)
+    else:
+        # have some speakers to print
+        counter = 1
+        commands = list((ADMIN_INSTRUCTION_SPEAKERS_ADD, ADMIN_INSTRUCTION_SPEAKERS_EDIT,
+                         ADMIN_INSTRUCTION_SPEAKERS_REMOVE))
+        commandsStringOut = '   '.join(commands)
+        print(INPUT_GLOBAL_LINE + ' Speaker ' + INPUT_GLOBAL_LINE)
+        print("number \t\t{}\t{}\t\t{}".format(INPUT_ADMINPAGE_SPEAKER_NAME,
+                                               INPUT_ADMINPAGE_SPEAKER_TOPIC, INPUT_ADMINPAGE_SPEAKER_DESCRIPTION))
+        for p in data[FILEHANDLER_SPEAKER]:
+            print("{}.\t\t{}\t{}\t\t{}".format(counter, p[FILEHANDLER_NAME],
+                                               p[FILEHANDLER_TOPIC], p[FILEHANDLER_DESCRIPTION]))
+        print("\n")
+        print(INPUT_GLOBAL_LINE + '   END   ' + INPUT_GLOBAL_LINE)
+        while True:
+            inputString = "Enter command ({} to exit)   ".format(INPUT_GLOBAL_QUITSTATEMENT) + commandsStringOut + ': '
+            inputCommands = input(inputString).strip()
+            if INPUT_GLOBAL_QUITSTATEMENT == inputCommands:
+                break
+            switcher = {
+                ADMIN_INSTRUCTION_SPEAKERS_ADD: admin_speaker_add,
+                ADMIN_INSTRUCTION_SPEAKERS_EDIT: admin_speaker_edit,
+                ADMIN_INSTRUCTION_SPEAKERS_REMOVE: admin_speaker_remove
+            }
+            func = switcher.get(inputCommands, invalidInstruction)
+            func()
+
+
+def admin_speaker_add():
+    print("in add")
+
+
+def admin_speaker_edit():
+    print("in edit")
+
+
+def admin_speaker_remove():
+    print("in remove")
+
+
+def openFile():
+    with open(FILEHANDLER_FILENAME, 'r') as jsonReader:
+        data = json.load(jsonReader)
+    return data
 
 
 def admin_surveys():

@@ -3,8 +3,11 @@ from os import system
 CLEARSCREEN = lambda: system('cls')
 # Crucial
 ADMINUSERNAME = "admin"
-QUITSTATEMENT = "quit"
+
 FILEHANDLER_USER = "users"
+FILEHANDLER_TOPIC = "topic"
+FILEHANDLER_DESCRIPTION = "description"
+FILEHANDLER_SPEAKER = "speakers"
 FILEHANDLER_USERNAME = "username"
 FILEHANDLER_PASSWORD = "password"
 FILEHANDLER_NAME = "name"
@@ -22,12 +25,20 @@ ADMIN_INSTRUCTION_SURVEY_START = "start"
 
 
 # Optional
+INPUT_GLOBAL_LINE = "************************** "
+INPUT_GLOBAL_QUITSTATEMENT = "quit"
 INPUT_LOGIN_USERNAME = "enter username:"
 INPUT_LOGIN_PASSWORD = "enter password:"
+INPUT_ADMINPAGE_SPEAKER_NAME = 'name'
+INPUT_ADMINPAGE_SPEAKER_TOPIC = 'topic'
+INPUT_ADMINPAGE_SPEAKER_DESCRIPTION = 'description'
+
 
 ERROR_LOGIN_SPACEINPUT = "spaces not allowed in inputs"
 ERROR_LOGIN_WRONGPASSWORD = "Wrong Password"
 ERROR_LOGIN_EMPTYINPUT = "empty input not allowed"
 ERROR_LOGIN_USERNAMENOTFOUND = "Unregistered username"
 ERROR_ADMINPAGE_UNKNOWNCOMMAND = "Unknown command"
+ERROR_ADMINPAGE_NOSPEAKER = "No speaker to show"
+
 

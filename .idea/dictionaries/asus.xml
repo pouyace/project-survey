@@ -1,13 +1,17 @@
 <component name="ProjectDictionaryState">
   <dictionary name="asus">
     <words>
+      <w>adminpage</w>
       <w>adminpassword</w>
       <w>adminusername</w>
+      <w>clearscreen</w>
       <w>emptyinput</w>
       <w>filehandler</w>
+      <w>nospeaker</w>
       <w>pouya</w>
       <w>quitstatement</w>
       <w>spaceinput</w>
+      <w>unknowncommand</w>
       <w>usernamenotfound</w>
       <w>wrongpassword</w>
     </words>

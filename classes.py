@@ -33,9 +33,8 @@ class Professor(User):
         super().__init__(_username)
         self.name = _name
 
-class Speaker(User):
-    def __init__(self, _name, _username):
-        super().__init__(_username)
+class Speaker:
+    def __init__(self, _name):
         self.name = _name
         self.topic = ""
         self.presentationDescription = ""
