@@ -1,6 +1,8 @@
 from os import system
 
 CLEARSCREEN = lambda: system('cls')
+WAITFORENTER = input
+
 # Crucial
 ADMINUSERNAME = "admin"
 

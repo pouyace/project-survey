@@ -13,6 +13,7 @@
       <w>spaceinput</w>
       <w>unknowncommand</w>
       <w>usernamenotfound</w>
+      <w>waitforenter</w>
       <w>wrongpassword</w>
     </words>
   </dictionary>

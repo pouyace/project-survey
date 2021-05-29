@@ -7,13 +7,13 @@ from configs import *
 import json
 
 frontUser = None
-
+usersContainer = None
 
 def mainFunction():
+    global usersContainer
     print("Please login in project(enter 'quit' to exit the application")
     global frontUser
-    with open(FILEHANDLER_FILENAME, 'r') as jsonReader:
-        data = json.load(jsonReader)
+    usersContainer = openFile()
 
     while True:
         username = input(INPUT_LOGIN_USERNAME)
@@ -30,7 +30,7 @@ def mainFunction():
             continue
         else:
             notFound = 1
-            for p in data[FILEHANDLER_USER]:
+            for p in usersContainer[FILEHANDLER_USER]:
                 if p[FILEHANDLER_USERNAME] == username:
                     notFound = 0
                     if p[FILEHANDLER_PASSWORD] == password:
@@ -72,27 +72,28 @@ def adminMainPage():
 
 
 def admin_speaker():
-    CLEARSCREEN()
-    data = openFile()
-
-    if not len(data[FILEHANDLER_SPEAKER]):
+    global usersContainer
+    commands = list((ADMIN_INSTRUCTION_SPEAKERS_ADD, ADMIN_INSTRUCTION_SPEAKERS_EDIT,
+                     ADMIN_INSTRUCTION_SPEAKERS_REMOVE))
+    commandsStringOut = '   '.join(commands)
+    if not len(usersContainer[FILEHANDLER_SPEAKER]):
         # no speaker to show
         print(ERROR_ADMINPAGE_NOSPEAKER)
     else:
         # have some speakers to print
-        counter = 1
-        commands = list((ADMIN_INSTRUCTION_SPEAKERS_ADD, ADMIN_INSTRUCTION_SPEAKERS_EDIT,
-                         ADMIN_INSTRUCTION_SPEAKERS_REMOVE))
-        commandsStringOut = '   '.join(commands)
-        print(INPUT_GLOBAL_LINE + ' Speaker ' + INPUT_GLOBAL_LINE)
-        print("number \t\t{}\t{}\t\t{}".format(INPUT_ADMINPAGE_SPEAKER_NAME,
-                                               INPUT_ADMINPAGE_SPEAKER_TOPIC, INPUT_ADMINPAGE_SPEAKER_DESCRIPTION))
-        for p in data[FILEHANDLER_SPEAKER]:
-            print("{}.\t\t{}\t{}\t\t{}".format(counter, p[FILEHANDLER_NAME],
-                                               p[FILEHANDLER_TOPIC], p[FILEHANDLER_DESCRIPTION]))
-        print("\n")
-        print(INPUT_GLOBAL_LINE + '   END   ' + INPUT_GLOBAL_LINE)
         while True:
+            counter = 1
+            CLEARSCREEN()
+            print(INPUT_GLOBAL_LINE + ' Speaker ' + INPUT_GLOBAL_LINE)
+            print("number \t\t{}\t{}\t\t{}".format(INPUT_ADMINPAGE_SPEAKER_NAME,
+                                                   INPUT_ADMINPAGE_SPEAKER_TOPIC, INPUT_ADMINPAGE_SPEAKER_DESCRIPTION))
+            for p in usersContainer[FILEHANDLER_SPEAKER]:
+                print("{}.\t\t{}\t{}\t\t{}".format(counter, p[FILEHANDLER_NAME],
+                                                   p[FILEHANDLER_TOPIC], p[FILEHANDLER_DESCRIPTION]))
+                counter += 1
+            print("")
+            print(INPUT_GLOBAL_LINE + '   END   ' + INPUT_GLOBAL_LINE)
+
             inputString = "Enter command ({} to exit)   ".format(INPUT_GLOBAL_QUITSTATEMENT) + commandsStringOut + ': '
             inputCommands = input(inputString).strip()
             if INPUT_GLOBAL_QUITSTATEMENT == inputCommands:
@@ -107,15 +108,76 @@ def admin_speaker():
 
 
 def admin_speaker_add():
-    print("in add")
+    CLEARSCREEN()
+    global usersContainer
+    print("Fill-in the information(enter {} to return)".format(INPUT_GLOBAL_QUITSTATEMENT))
+
+    while True:
+        newSpeakerName = input("Enter speaker name:")
+        if INPUT_GLOBAL_QUITSTATEMENT in newSpeakerName:
+            return
+        if not len(newSpeakerName.strip()):
+            print(ERROR_LOGIN_EMPTYINPUT)
+            continue
+        break
+    while True:
+        newSpeakerTopic = input("Enter presentation topic:")
+        if INPUT_GLOBAL_QUITSTATEMENT in newSpeakerTopic:
+            return
+        if not len(newSpeakerTopic.strip()):
+            print(ERROR_LOGIN_EMPTYINPUT)
+            continue
+        break
+    newSpeakerDescription = input("Enter presentation Description:")
+    newSpeaker = Speaker(newSpeakerName)
+    newSpeaker.setTopic(newSpeakerTopic)
+    newSpeaker.setPresentationDescription(newSpeakerDescription)
+    userWriter(FILEHANDLER_SPEAKER, newSpeaker)
+    print("Speaker has been added successfully!")
+    WAITFORENTER()
+
 
 
 def admin_speaker_edit():
-    print("in edit")
+    CLEARSCREEN()
+    global usersContainer
+    while True:
+        speakerName = input("Enter speaker name(enter {} to return):".format(INPUT_GLOBAL_QUITSTATEMENT))
+        if INPUT_GLOBAL_QUITSTATEMENT in speakerName:
+            return
+        for i in usersContainer[FILEHANDLER_SPEAKER]:
+            if i[FILEHANDLER_NAME] == speakerName:
+                newName = input("Enter new name:(Hit Enter for no change)")
+                newTopic = input("Enter new topic:(Hit Enter for no change)")
+                newDescription = input("Enter new description:(Hit Enter for no change)")
+                if len(newName):
+                    i[FILEHANDLER_NAME] = newName
+                if len(newTopic):
+                    i[FILEHANDLER_TOPIC] = newTopic
+                if len(newDescription):
+                    i[FILEHANDLER_DESCRIPTION] = newDescription
+                print("Operation Done!")
+                WAITFORENTER()
+                return
+        else:
+            print(ERROR_LOGIN_USERNAMENOTFOUND)
 
 
 def admin_speaker_remove():
-    print("in remove")
+    global usersContainer
+
+    while True:
+        speakerName = input("Enter speaker name(enter {} to return):".format(INPUT_GLOBAL_QUITSTATEMENT))
+        if INPUT_GLOBAL_QUITSTATEMENT in speakerName:
+            return
+        if not len(speakerName.strip()):
+            print(ERROR_LOGIN_EMPTYINPUT)
+            continue
+        else:
+            isDone = userRemover(FILEHANDLER_SPEAKER, speakerName)
+            print("Speaker has been added successfully!") if isDone else print(ERROR_LOGIN_USERNAMENOTFOUND)
+            WAITFORENTER()
+            return
 
 
 def openFile():
@@ -141,28 +203,24 @@ def invalidInstruction():
     print(ERROR_ADMINPAGE_UNKNOWNCOMMAND)
 
 
-def userWriter():
-    """
-    data = {'users': []}
-    data['users'].append({
-        'name': 'Pouya',
-        'username': 'pouya',
-        'password': 'pouya'
-    })
-    data['users'].append({
-        'name': 'admin',
-        'username': 'admin',
-        'password': 'admin'
-    })
-    data['users'].append({
-        'name': 'test',
-        'username': 'test',
-        'password': 'test'
-    })
+def userWriter(userType, user):
+    global usersContainer
+    if userType == FILEHANDLER_SPEAKER:
+        usersContainer[userType].append({
+            FILEHANDLER_NAME: user.name,
+            FILEHANDLER_TOPIC: user.topic,
+            FILEHANDLER_DESCRIPTION: user.presentationDescription
+        })
 
-    with open('users.txt', 'w') as outfile:
-        json.dump(data, outfile)
-"""
+def userRemover(userType, username):
+    global usersContainer
+    if userType == FILEHANDLER_SPEAKER:
+        for i in usersContainer[userType]:
+            if i[FILEHANDLER_NAME] == username:
+                usersContainer[userType].remove(i)
+                return True
+        else:
+            return False
 
 
 if __name__ == "__main__":
