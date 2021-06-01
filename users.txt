@@ -1,2 +1,2 @@
 {"users": [{"name": "Pouya", "username": "pouya", "password": "pouya"}, {"name": "admin", "username": "admin", "password": "admin"}, {"name": "test", "username": "test", "password": "test"}],
- "speakers":[{"name": "speaker1", "topic": "programming", "description":"about python"}]}
+ "speakers":[{"name": "speaker1", "topic": "programming", "description":"about python", "status":"ACTIVE"}]}

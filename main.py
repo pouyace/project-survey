@@ -9,13 +9,16 @@ import json
 frontUser = None
 usersContainer = None
 
+# Done
 def mainFunction():
     global usersContainer
-    print("Please login in project(enter 'quit' to exit the application")
     global frontUser
+
     usersContainer = openFile()
 
     while True:
+        CLEARSCREEN()
+        print("Please login in project(enter '{}' to exit the application".format(INPUT_GLOBAL_QUITSTATEMENT))
         username = input(INPUT_LOGIN_USERNAME)
         if INPUT_GLOBAL_QUITSTATEMENT in username:
             break
@@ -43,23 +46,25 @@ def mainFunction():
                         break
                     else:
                         print(ERROR_LOGIN_WRONGPASSWORD)
+                        WAITFORENTER()
                         break
             if notFound:
                 print(ERROR_LOGIN_USERNAMENOTFOUND)
+                WAITFORENTER()
 
-
+# Done
 def greeting():
     print("*******************  Welcome to Project  *******************\n\n")
 
-
+# Done
 def adminMainPage():
-    CLEARSCREEN()
     switcher = {
         ADMIN_INSTRUCTION_SPEAKERS: admin_speaker,
         ADMIN_INSTRUCTION_SURVEY: admin_surveys,
         ADMIN_INSTRUCTION_LOGOUT: logout
     }
     while True:
+        CLEARSCREEN()
         instruction = input("select an operation(enter {} to logout): {} {} {} "
                             "            ".format(ADMIN_INSTRUCTION_LOGOUT,
                                                   ADMIN_INSTRUCTION_SPEAKERS,
@@ -71,42 +76,33 @@ def adminMainPage():
         func()
 
 
+# Done
 def admin_speaker():
     global usersContainer
     commands = list((ADMIN_INSTRUCTION_SPEAKERS_ADD, ADMIN_INSTRUCTION_SPEAKERS_EDIT,
                      ADMIN_INSTRUCTION_SPEAKERS_REMOVE))
     commandsStringOut = '   '.join(commands)
-    if not len(usersContainer[FILEHANDLER_SPEAKER]):
-        # no speaker to show
-        print(ERROR_ADMINPAGE_NOSPEAKER)
-    else:
+    switcher = {
+        ADMIN_INSTRUCTION_SPEAKERS_ADD: admin_speaker_add,
+        ADMIN_INSTRUCTION_SPEAKERS_EDIT: admin_speaker_edit,
+        ADMIN_INSTRUCTION_SPEAKERS_REMOVE: admin_speaker_remove
+    }
+    while True:
+        CLEARSCREEN()
+        if not len(usersContainer[FILEHANDLER_SPEAKER]):
+            # no speaker to show
+            print(ERROR_ADMINPAGE_NOSPEAKER)
         # have some speakers to print
-        while True:
-            counter = 1
-            CLEARSCREEN()
-            print(INPUT_GLOBAL_LINE + ' Speaker ' + INPUT_GLOBAL_LINE)
-            print("number \t\t{}\t{}\t\t{}".format(INPUT_ADMINPAGE_SPEAKER_NAME,
-                                                   INPUT_ADMINPAGE_SPEAKER_TOPIC, INPUT_ADMINPAGE_SPEAKER_DESCRIPTION))
-            for p in usersContainer[FILEHANDLER_SPEAKER]:
-                print("{}.\t\t{}\t{}\t\t{}".format(counter, p[FILEHANDLER_NAME],
-                                                   p[FILEHANDLER_TOPIC], p[FILEHANDLER_DESCRIPTION]))
-                counter += 1
-            print("")
-            print(INPUT_GLOBAL_LINE + '   END   ' + INPUT_GLOBAL_LINE)
+        else:
+            showSpeakers()
+        inputString = "Enter command ({} to exit)   ".format(INPUT_GLOBAL_QUITSTATEMENT) + commandsStringOut + ': '
+        inputCommands = input(inputString).strip()
+        if INPUT_GLOBAL_QUITSTATEMENT == inputCommands:
+            break
+        func = switcher.get(inputCommands, invalidInstruction)
+        func()
 
-            inputString = "Enter command ({} to exit)   ".format(INPUT_GLOBAL_QUITSTATEMENT) + commandsStringOut + ': '
-            inputCommands = input(inputString).strip()
-            if INPUT_GLOBAL_QUITSTATEMENT == inputCommands:
-                break
-            switcher = {
-                ADMIN_INSTRUCTION_SPEAKERS_ADD: admin_speaker_add,
-                ADMIN_INSTRUCTION_SPEAKERS_EDIT: admin_speaker_edit,
-                ADMIN_INSTRUCTION_SPEAKERS_REMOVE: admin_speaker_remove
-            }
-            func = switcher.get(inputCommands, invalidInstruction)
-            func()
-
-
+# Done
 def admin_speaker_add():
     CLEARSCREEN()
     global usersContainer
@@ -128,18 +124,18 @@ def admin_speaker_add():
             print(ERROR_LOGIN_EMPTYINPUT)
             continue
         break
-    newSpeakerDescription = input("Enter presentation Description:")
+    newSpeakerDescription = input("Enter presentation Description(optional):")
     newSpeaker = Speaker(newSpeakerName)
     newSpeaker.setTopic(newSpeakerTopic)
     newSpeaker.setPresentationDescription(newSpeakerDescription)
     userWriter(FILEHANDLER_SPEAKER, newSpeaker)
-    print("Speaker has been added successfully!")
+    print(OUTPUT_SPEAKER_ADDITION_SUCCEED)
     WAITFORENTER()
 
 
-
 def admin_speaker_edit():
-    CLEARSCREEN()
+    # need to verity the input
+    # CLEARSCREEN()
     global usersContainer
     while True:
         speakerName = input("Enter speaker name(enter {} to return):".format(INPUT_GLOBAL_QUITSTATEMENT))
@@ -150,19 +146,26 @@ def admin_speaker_edit():
                 newName = input("Enter new name:(Hit Enter for no change)")
                 newTopic = input("Enter new topic:(Hit Enter for no change)")
                 newDescription = input("Enter new description:(Hit Enter for no change)")
+                newStatus = input("Do you want to toggle the status?"
+                                  "(current status = '{}') y/n".format(i[FILEHANDLER_SPEAKER_STATUS]))
                 if len(newName):
                     i[FILEHANDLER_NAME] = newName
                 if len(newTopic):
                     i[FILEHANDLER_TOPIC] = newTopic
                 if len(newDescription):
                     i[FILEHANDLER_DESCRIPTION] = newDescription
-                print("Operation Done!")
+                if newStatus == "y":
+                    if i[FILEHANDLER_SPEAKER_STATUS] == FILEHANDLER_SPEAKER_STATUS_ACTIVE:
+                        i[FILEHANDLER_SPEAKER_STATUS] = FILEHANDLER_SPEAKER_STATUS_PASSIVE
+                    else:
+                        i[FILEHANDLER_SPEAKER_STATUS] = FILEHANDLER_SPEAKER_STATUS_ACTIVE
+                print(OUTPUT_SPEAKER_EDITION_SUCCEED)
                 WAITFORENTER()
                 return
         else:
             print(ERROR_LOGIN_USERNAMENOTFOUND)
 
-
+# Done
 def admin_speaker_remove():
     global usersContainer
 
@@ -175,9 +178,26 @@ def admin_speaker_remove():
             continue
         else:
             isDone = userRemover(FILEHANDLER_SPEAKER, speakerName)
-            print("Speaker has been added successfully!") if isDone else print(ERROR_LOGIN_USERNAMENOTFOUND)
+            print(OUTPUT_SPEAKER_DELETION_SUCCEED) if isDone else print(ERROR_LOGIN_USERNAMENOTFOUND)
             WAITFORENTER()
             return
+
+
+def showSpeakers():
+    counter = 1
+    CLEARSCREEN()
+    print(INPUT_GLOBAL_LINE + ' Speaker ' + INPUT_GLOBAL_LINE)
+    print("number \t\t{}\t\t{}\t\t{}\t\t{}".format(INPUT_ADMINPAGE_SPEAKER_NAME,
+                                                   INPUT_ADMINPAGE_SPEAKER_TOPIC,
+                                                   INPUT_ADMINPAGE_SPEAKER_DESCRIPTION,
+                                                   INPUT_ADMINPAGE_SPEAKER_STATUS))
+    for p in usersContainer[FILEHANDLER_SPEAKER]:
+        print("{}.\t\t{}\t\t{}\t\t{}\t\t{}".format(counter, p[FILEHANDLER_NAME],
+                                                   p[FILEHANDLER_TOPIC], p[FILEHANDLER_DESCRIPTION],
+                                                   p[FILEHANDLER_SPEAKER_STATUS]))
+        counter += 1
+    print("")
+    print(INPUT_GLOBAL_LINE + '   END   ' + INPUT_GLOBAL_LINE)
 
 
 def openFile():
@@ -209,8 +229,10 @@ def userWriter(userType, user):
         usersContainer[userType].append({
             FILEHANDLER_NAME: user.name,
             FILEHANDLER_TOPIC: user.topic,
-            FILEHANDLER_DESCRIPTION: user.presentationDescription
+            FILEHANDLER_DESCRIPTION: user.presentationDescription,
+            FILEHANDLER_SPEAKER_STATUS: user.status
         })
+
 
 def userRemover(userType, username):
     global usersContainer

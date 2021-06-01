@@ -18,6 +18,7 @@ SpeakerFeatures:
     5. sufficient knowledge (int)
 
 """
+from configs import *
 from abc import ABC
 class User(ABC):
     def __init__(self, _username):
@@ -38,6 +39,7 @@ class Speaker:
         self.name = _name
         self.topic = ""
         self.presentationDescription = ""
+        self.status = FILEHANDLER_SPEAKER_STATUS_PASSIVE
 
     def setTopic(self, topic):
         self.topic = topic
