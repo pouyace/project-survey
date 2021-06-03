@@ -20,19 +20,24 @@ SpeakerFeatures:
 """
 from configs import *
 from abc import ABC
+
+
 class User(ABC):
     def __init__(self, _username):
         self.username = _username
+
 
 class Student(User):
     def __init__(self, _name, _username):
         super().__init__(_username)
         self.name = _name
 
+
 class Professor(User):
     def __init__(self, _name, _username):
         super().__init__(_username)
         self.name = _name
+
 
 class Speaker:
     def __init__(self, _name):
@@ -47,10 +52,11 @@ class Speaker:
     def setPresentationDescription(self, presentationDescription):
         self.presentationDescription = presentationDescription
 
+
 class SingleSurvey:
-    def __init__(self, owner):
-        self.owner = owner
+    def __init__(self, participant):
         self.comment = ""
+        self.participant = participant
         self.rating = None
 
     def setComment(self, comment):
@@ -75,3 +81,7 @@ class SpeakerFeatures:
         self.ConnectionWithAudience = ConnectionWithAudience
         self.punctuality = punctuality
         self.sufficientKnowledge = sufficientKnowledge
+
+    def getRating(self):
+        return list((self.concentrationOnTopic, self.speedOfSpeaking, self.ConnectionWithAudience
+                     , self.punctuality, self.sufficientKnowledge))
