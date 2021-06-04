@@ -4,6 +4,9 @@ Survey Project
 """
 from classes import *
 from configs import *
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 import json
 
 frontUser = None
@@ -222,7 +225,41 @@ def openFile():
 
 
 def admin_surveys():
-    pass
+    global usersContainer
+    CLEARSCREEN()
+    activeSpeakers = getActiveSpeakersCount()
+    print(INPUT_GLOBAL_LINE)
+    print("active speakers:")
+    for i, counter in zip(activeSpeakers, range(len(activeSpeakers))):
+        print("    {}. {}".format(counter + 1, i))
+    print(INPUT_GLOBAL_LINE)
+    while True:
+        speakerName = input("enter speaker name to view the result:  ")
+        if speakerName not in activeSpeakers:
+            print("speaker not found")
+        else:
+            break
+    showSurveyResult(speakerName)
+
+
+def showSurveyResult(speakerName):
+    speakerSurvey = next((item for item in usersContainer[FILEHANDLER_SURVEY]
+                          if item[FILEHANDLER_SURVEY_OWNER] == speakerName))
+    labels = list(item[FILEHANDLER_SURVEY_SINGLESURVEY_participant] for item in speakerSurvey[FILEHANDLER_SURVEY_SINGLESURVEY])
+    mainData = [[int(li) for li in item[FILEHANDLER_SURVEY_SINGLESURVEY_RATING]] for item in
+                speakerSurvey[FILEHANDLER_SURVEY_SINGLESURVEY]]
+    for i, counter in zip(mainData, range(len(labels))):
+        i.insert(0, labels[counter])
+
+    df = pd.DataFrame(mainData, columns=['Students', 'concentration on topic', 'speaking speed',
+                                         'connection with audience', 'punctuality', 'knowledge'])
+
+    df.plot(x='Students',
+            kind='bar',
+            stacked=False,
+            title='Grouped Bar Graph with dataframe')
+    plt.show()
+    WAITFORENTER()
 
 
 def userMainPage():
@@ -259,7 +296,7 @@ def user_survey():
             print(INPUT_GLOBAL_LINE)
             print("there are {} survey(s) left to take-in: ".format(len(availableSpeakers)))
             for i, counter in zip(availableSpeakers, range(len(availableSpeakers))):
-                print("    {}. survey for {}".format(counter+1, i))
+                print("    {}. survey for {}".format(counter + 1, i))
             print(INPUT_GLOBAL_LINE)
             while True:
                 speakerName = input("Enter the speaker name for starting survey(Enter {} to return)"
@@ -271,6 +308,7 @@ def user_survey():
                 else:
                     user_survey_add(speakerName, frontUser.username)
                     break
+
 
 def user_survey_add(owner, username):
     CLEARSCREEN()
