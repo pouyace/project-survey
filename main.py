@@ -6,7 +6,6 @@ from classes import *
 from configs import *
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 import json
 
 frontUser = None
@@ -67,15 +66,17 @@ def adminMainPage():
     switcher = {
         ADMIN_INSTRUCTION_SPEAKERS: admin_speaker,
         ADMIN_INSTRUCTION_SURVEY: admin_surveys,
-        ADMIN_INSTRUCTION_LOGOUT: logout
+        ADMIN_INSTRUCTION_LOGOUT: logout,
+        ADMIN_INSTRUCTION_VIEWALL: admin_viewAll
     }
     while True:
         CLEARSCREEN()
-        instruction = input("select an operation(enter {} to logout): {} {} {} "
+        instruction = input("select an operation(enter {} to logout): {} {} {} {}"
                             "            ".format(ADMIN_INSTRUCTION_LOGOUT,
                                                   ADMIN_INSTRUCTION_SPEAKERS,
                                                   ADMIN_INSTRUCTION_SURVEY,
-                                                  ADMIN_INSTRUCTION_LOGOUT))
+                                                  ADMIN_INSTRUCTION_LOGOUT,
+                                                  ADMIN_INSTRUCTION_VIEWALL))
         func = switcher.get(instruction, invalidInstruction)
         if instruction == ADMIN_INSTRUCTION_LOGOUT:
             logout()
@@ -228,13 +229,19 @@ def admin_surveys():
     global usersContainer
     CLEARSCREEN()
     activeSpeakers = getActiveSpeakersCount()
+    if len(activeSpeakers) == 0:
+        print("No active speaker")
+        WAITFORENTER()
+        return
     print(INPUT_GLOBAL_LINE)
     print("active speakers:")
     for i, counter in zip(activeSpeakers, range(len(activeSpeakers))):
         print("    {}. {}".format(counter + 1, i))
     print(INPUT_GLOBAL_LINE)
     while True:
-        speakerName = input("enter speaker name to view the result:  ")
+        speakerName = input("enter speaker name to view the result(Enter quit to return):  ")
+        if INPUT_GLOBAL_QUITSTATEMENT in speakerName:
+            return
         if speakerName not in activeSpeakers:
             print("speaker not found")
         else:
@@ -245,12 +252,33 @@ def admin_surveys():
 def showSurveyResult(speakerName):
     speakerSurvey = next((item for item in usersContainer[FILEHANDLER_SURVEY]
                           if item[FILEHANDLER_SURVEY_OWNER] == speakerName))
-    labels = list(item[FILEHANDLER_SURVEY_SINGLESURVEY_participant] for item in speakerSurvey[FILEHANDLER_SURVEY_SINGLESURVEY])
+    # labels = list(item[FILEHANDLER_SURVEY_SINGLESURVEY_participant] for item in speakerSurvey[FILEHANDLER_SURVEY_SINGLESURVEY])
+    labels = "student"
     mainData = [[int(li) for li in item[FILEHANDLER_SURVEY_SINGLESURVEY_RATING]] for item in
                 speakerSurvey[FILEHANDLER_SURVEY_SINGLESURVEY]]
+    if len(mainData) == 0:
+        print("no score yet")
+        WAITFORENTER()
+        return
     for i, counter in zip(mainData, range(len(labels))):
-        i.insert(0, labels[counter])
+        i.insert(0, labels)
+    print(mainData)
+    avgScores = []
+    for i in range(5):
+        avg = 0
+        for j in mainData:
+            avg += j[i + 1]
+        avgScores.append(avg / len(mainData))
+    print("average concentration on topic:", avgScores[0])
+    print("average speaking speed:", avgScores[1])
+    print("average connection with audience:", avgScores[2])
+    print("average punctuality:", avgScores[3])
+    print("average knowledge:", avgScores[4])
+    print("Comments:")
 
+    for item in speakerSurvey[FILEHANDLER_SURVEY_SINGLESURVEY]:
+        print(item[FILEHANDLER_SURVEY_SINGLESURVEY_COMMENT])
+    print(mainData)
     df = pd.DataFrame(mainData, columns=['Students', 'concentration on topic', 'speaking speed',
                                          'connection with audience', 'punctuality', 'knowledge'])
 
@@ -260,6 +288,55 @@ def showSurveyResult(speakerName):
             title='Grouped Bar Graph with dataframe')
     plt.show()
     WAITFORENTER()
+
+
+def admin_viewAll():
+    CLEARSCREEN()
+    survey = usersContainer[FILEHANDLER_SURVEY]
+    if len(survey) == 0:
+        print("no active speaker")
+        WAITFORENTER()
+        return
+    speakersScores = []
+    for curSpeaker in survey:
+        mainData = [[int(li) for li in item[FILEHANDLER_SURVEY_SINGLESURVEY_RATING]] for item in
+                    curSpeaker[FILEHANDLER_SURVEY_SINGLESURVEY]]
+        print("----speaker '" + curSpeaker[FILEHANDLER_SURVEY_OWNER] + "':")
+        if len(mainData) == 0:
+            continue
+        avgScores = []
+        for i in range(5):
+            avg = 0
+            for j in mainData:
+                avg += j[i]
+            avgScores.append(avg / len(mainData))
+        speakersScores.append(avgScores)
+        speakersScores[-1].insert(0, curSpeaker[FILEHANDLER_SURVEY_OWNER])
+        print("average concentration on topic:", avgScores[1])
+        print("average speaking speed:", avgScores[2])
+        print("average connection with audience:", avgScores[3])
+        print("average punctuality:", avgScores[4])
+        print("average knowledge:", avgScores[5])
+        print("Comments:")
+        for item in curSpeaker[FILEHANDLER_SURVEY_SINGLESURVEY]:
+            print(item[FILEHANDLER_SURVEY_SINGLESURVEY_COMMENT])
+
+    print("*******************************")
+    print(speakersScores)
+    if len(speakersScores) == 0:
+        print("No data to show")
+        WAITFORENTER()
+        return
+    print("*******************************")
+
+    df = pd.DataFrame(speakersScores, columns=['SPEAKERS', 'concentration on topic', 'speaking speed',
+                                               'connection with audience', 'punctuality', 'knowledge'])
+
+    df.plot(x='SPEAKERS',
+            kind='bar',
+            stacked=False,
+            title='Grouped Bar Graph with dataFrame')
+    plt.show()
 
 
 def userMainPage():
