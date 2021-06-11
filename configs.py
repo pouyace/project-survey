@@ -60,11 +60,19 @@ ERROR_UNKNOWNCOMMAND = "Unknown command"
 ERROR_ADMINPAGE_NOSPEAKER = "No speaker to show"
 ERROR_SURVEY_ADDITION_FAILED = 'OPERATION FAILED'
 ERROR_FILE_UPDATING = "File writer failed"
+ERROR_NO_DATA = "No data to show"
+ERROR_SPEAKER_NOT_FOUND = "speaker not found"
 
 
 OUTPUT_SPEAKER_ADDITION_SUCCEED = "Speaker has been added successfully!"
 OUTPUT_SPEAKER_DELETION_SUCCEED = "Speaker has been added successfully!"
 OUTPUT_SPEAKER_EDITION_SUCCEED = "Editing Operation Done!"
 OUTPUT_ADDING_SURVEY_SUCCEED = "operation succeed. Thanks for your company!"
-
+OUTPUT_AVERAGE_CONCENTRATION = "\tAverage concentration on topic:"
+OUTPUT_AVERAGE_SPEED = "\tAverage speaking speed:"
+OUTPUT_AVERAGE_CONNECTION = "\tAverage connection with audience:"
+OUTPUT_AVERAGE_PUNCTUALITY = "\tAverage punctuality:"
+OUTPUT_AVERAGE_KNOWLEDGE = "\tAverage knowledge:"
+OUTPUT_HIGHEST_AVERAGE = "--> highest average score: {} with score {:.2f}"
+OUTPUT_LOWEST_AVERAGE = "--> Lowest average score: {} with score {:.2f}"
 

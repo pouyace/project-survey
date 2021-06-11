@@ -230,7 +230,7 @@ def admin_surveys():
     CLEARSCREEN()
     activeSpeakers = getActiveSpeakersCount()
     if len(activeSpeakers) == 0:
-        print("No active speaker")
+        print(ERROR_ADMINPAGE_NOSPEAKER)
         WAITFORENTER()
         return
     print(INPUT_GLOBAL_LINE)
@@ -243,7 +243,7 @@ def admin_surveys():
         if INPUT_GLOBAL_QUITSTATEMENT in speakerName:
             return
         if speakerName not in activeSpeakers:
-            print("speaker not found")
+            print(ERROR_SPEAKER_NOT_FOUND)
         else:
             break
     showSurveyResult(speakerName)
@@ -257,28 +257,27 @@ def showSurveyResult(speakerName):
     mainData = [[int(li) for li in item[FILEHANDLER_SURVEY_SINGLESURVEY_RATING]] for item in
                 speakerSurvey[FILEHANDLER_SURVEY_SINGLESURVEY]]
     if len(mainData) == 0:
-        print("no score yet")
+        print(ERROR_NO_DATA)
         WAITFORENTER()
         return
-    for i, counter in zip(mainData, range(len(labels))):
+    for i in mainData:
         i.insert(0, labels)
-    print(mainData)
+    # print(mainData)
     avgScores = []
     for i in range(5):
         avg = 0
         for j in mainData:
             avg += j[i + 1]
         avgScores.append(avg / len(mainData))
-    print("average concentration on topic:", avgScores[0])
-    print("average speaking speed:", avgScores[1])
-    print("average connection with audience:", avgScores[2])
-    print("average punctuality:", avgScores[3])
-    print("average knowledge:", avgScores[4])
-    print("Comments:")
-
+    print(OUTPUT_AVERAGE_CONCENTRATION, "{:.2f}".format(avgScores[0]))
+    print(OUTPUT_AVERAGE_SPEED, "{:.2f}".format(avgScores[1]))
+    print(OUTPUT_AVERAGE_CONNECTION, "{:.2f}".format(avgScores[2]))
+    print(OUTPUT_AVERAGE_PUNCTUALITY, "{:.2f}".format(avgScores[3]))
+    print(OUTPUT_AVERAGE_KNOWLEDGE, "{:.2f}".format(avgScores[4]))
+    print("--Comments:")
     for item in speakerSurvey[FILEHANDLER_SURVEY_SINGLESURVEY]:
-        print(item[FILEHANDLER_SURVEY_SINGLESURVEY_COMMENT])
-    print(mainData)
+        print("\t{}".format(item[FILEHANDLER_SURVEY_SINGLESURVEY_COMMENT]))
+    # print(mainData)
     df = pd.DataFrame(mainData, columns=['Students', 'concentration on topic', 'speaking speed',
                                          'connection with audience', 'punctuality', 'knowledge'])
 
@@ -294,7 +293,7 @@ def admin_viewAll():
     CLEARSCREEN()
     survey = usersContainer[FILEHANDLER_SURVEY]
     if len(survey) == 0:
-        print("no active speaker")
+        print(ERROR_ADMINPAGE_NOSPEAKER)
         WAITFORENTER()
         return
     speakersScores = []
@@ -312,22 +311,40 @@ def admin_viewAll():
             avgScores.append(avg / len(mainData))
         speakersScores.append(avgScores)
         speakersScores[-1].insert(0, curSpeaker[FILEHANDLER_SURVEY_OWNER])
-        print("average concentration on topic:", avgScores[1])
-        print("average speaking speed:", avgScores[2])
-        print("average connection with audience:", avgScores[3])
-        print("average punctuality:", avgScores[4])
-        print("average knowledge:", avgScores[5])
-        print("Comments:")
+        print(OUTPUT_AVERAGE_CONCENTRATION, "{:.2f}".format(avgScores[1]))
+        print(OUTPUT_AVERAGE_SPEED, "{:.2f}".format(avgScores[2]))
+        print(OUTPUT_AVERAGE_CONNECTION, "{:.2f}".format(avgScores[3]))
+        print(OUTPUT_AVERAGE_PUNCTUALITY, "{:.2f}".format(avgScores[4]))
+        print(OUTPUT_AVERAGE_KNOWLEDGE, "{:.2f}".format(avgScores[5]))
+        print("--Comments:")
         for item in curSpeaker[FILEHANDLER_SURVEY_SINGLESURVEY]:
-            print(item[FILEHANDLER_SURVEY_SINGLESURVEY_COMMENT])
+            print("\t{}".format(item[FILEHANDLER_SURVEY_SINGLESURVEY_COMMENT]))
+        print(INPUT_GLOBAL_LINE + INPUT_GLOBAL_LINE)
 
-    print("*******************************")
-    print(speakersScores)
+    # print("(DEBUG) speakerScores:", speakersScores)
     if len(speakersScores) == 0:
-        print("No data to show")
+        print(ERROR_NO_DATA)
         WAITFORENTER()
         return
-    print("*******************************")
+
+    totalAvg = []
+    for i in speakersScores:
+        totalAvg.append([i[0], sum(i[1:])/(len(i)-1)])
+
+    # print(totalAvg)
+    maxAvg = 0
+    minAvg = 10
+    maxAvgN = minAvgN = ""
+    for i in totalAvg:
+        if i[1] > maxAvg:
+            maxAvg = i[1]
+            maxAvgN = i[0]
+        if i[1] < minAvg:
+            minAvg = i[1]
+            minAvgN = i[0]
+    print(OUTPUT_HIGHEST_AVERAGE.format(maxAvgN, maxAvg))
+    print(OUTPUT_LOWEST_AVERAGE.format(minAvgN, minAvg))
+
 
     df = pd.DataFrame(speakersScores, columns=['SPEAKERS', 'concentration on topic', 'speaking speed',
                                                'connection with audience', 'punctuality', 'knowledge'])
@@ -362,12 +379,12 @@ def user_survey():
     CLEARSCREEN()
     activeSpeakersCount = getActiveSpeakersCount()
     if not len(activeSpeakersCount):
-        print("No survey has been set")
+        print(ERROR_NO_DATA)
         WAITFORENTER()
     else:
         availableSpeakers = set(getAvailableSpeakers(frontUser.username)).intersection(activeSpeakersCount)
         if not len(availableSpeakers):
-            print("no active survey left")
+            print(ERROR_ADMINPAGE_NOSPEAKER)
             WAITFORENTER()
         else:
             print(INPUT_GLOBAL_LINE)
@@ -381,7 +398,7 @@ def user_survey():
                 if INPUT_GLOBAL_QUITSTATEMENT in speakerName:
                     return
                 elif speakerName not in availableSpeakers:
-                    print("speaker not found")
+                    print(ERROR_SPEAKER_NOT_FOUND)
                 else:
                     user_survey_add(speakerName, frontUser.username)
                     break
@@ -403,31 +420,31 @@ def user_survey_add(owner, username):
 def getSpeakerFeaturesFromUser():
     while True:
         speedOfSpeaking = input("score the speed of speaking(1-10): ")
-        if not speedOfSpeaking.strip().isdigit():
+        if not speedOfSpeaking.strip().isdigit() or not (int(speedOfSpeaking.strip()) in range(1, 11)):
             print("Enter a valid number from 1 to 10")
         else:
             break
     while True:
         concentrationOnTopic = input("score the concentration of topic(1-10): ")
-        if not concentrationOnTopic.strip().isdigit():
+        if not concentrationOnTopic.strip().isdigit() or not (int(concentrationOnTopic.strip()) in range(1, 11)):
             print("Enter a valid number from 1 to 10")
         else:
             break
     while True:
         punctuality = input("score the speaker punctuality(1-10): ")
-        if not punctuality.strip().isdigit():
+        if (not punctuality.strip().isdigit()) or not (int(punctuality.strip()) in range(1, 11)):
             print("Enter a valid number from 1 to 10")
         else:
             break
     while True:
         sufficientKnowledge = input("score the speaker Knowledge(1-10): ")
-        if not sufficientKnowledge.strip().isdigit():
+        if not sufficientKnowledge.strip().isdigit() or not (int(sufficientKnowledge.strip()) in range(1, 11)):
             print("Enter a valid number from 1 to 10")
         else:
             break
     while True:
         connectionWithAudience = input("score the speaker connection with audience(1-10): ")
-        if not connectionWithAudience.strip().isdigit():
+        if not connectionWithAudience.strip().isdigit() or not (int(connectionWithAudience.strip()) in range(1, 11)):
             print("Enter a valid number from 1 to 10")
         else:
             break
@@ -493,6 +510,9 @@ def userRemover(userType, username):
         for i in usersContainer[userType]:
             if i[FILEHANDLER_NAME] == username:
                 usersContainer[userType].remove(i)
+                for j in usersContainer[FILEHANDLER_SURVEY]:
+                    if j[FILEHANDLER_SURVEY_OWNER] == username:
+                        usersContainer[FILEHANDLER_SURVEY].remove(j)
                 updateFile()
                 return True
         else:
@@ -502,7 +522,7 @@ def userRemover(userType, username):
 def surveyWriter(owner, result):
     for i in usersContainer[FILEHANDLER_SURVEY]:
         if i[FILEHANDLER_SURVEY_OWNER] == owner:
-            print(i[FILEHANDLER_SURVEY_SINGLESURVEY])
+            # print(i[FILEHANDLER_SURVEY_SINGLESURVEY])
             i[FILEHANDLER_SURVEY_SINGLESURVEY].append(
                 {
                     FILEHANDLER_SURVEY_SINGLESURVEY_participant: result.participant,
